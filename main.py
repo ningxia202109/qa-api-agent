@@ -1,5 +1,5 @@
-from tools import SwaggerAPIReader
-import json
+from src.tools import SwaggerAPIReader
+# import json
 
 
 def main():
