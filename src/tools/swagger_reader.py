@@ -80,20 +80,3 @@ def get_api_spec() -> str:
     selected_api = "/bytes/{n}"
     selected_apiSpec = reader.get_endpoint(selected_api)
     return selected_apiSpec.full_spec_in_json()
-
-
-# Example usage
-if __name__ == "__main__":
-    swagger_url = "https://httpbin.org/spec.json"
-
-    api_reader = SwaggerAPIReader(swagger_url)
-    # api_reader.print_api_summary()
-
-    # Example of accessing a specific endpoint
-    selected_api = "/bytes/{n}"
-    selected_apiSpec = api_reader.get_endpoint(selected_api)
-    if selected_apiSpec:
-        print(f"\nDetails for {selected_api} endpoint:")
-        print(f"Methods: {selected_apiSpec.get_all_methods()}")
-        print("Full specification in JSON format:")
-        print(selected_apiSpec.full_spec_in_json())
