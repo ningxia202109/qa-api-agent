@@ -2,6 +2,7 @@ import requests
 from typing import Dict, Optional
 from src.models import ApiSpec
 
+
 class SwaggerAPIReader:
     def __init__(self, swagger_url: str):
         self.swagger_url = swagger_url

@@ -4,8 +4,9 @@ from autogen_agentchat.task import TextMentionTermination, MaxMessageTermination
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_agentchat.task import Console
 
+
 async def group_chat():
-    
+
     text_termination = TextMentionTermination("APPROVE")
     max_message_termination = MaxMessageTermination(5)
 
@@ -15,8 +16,5 @@ async def group_chat():
         [swagger_agent],
         termination_condition=termination,
     )
-    
-    await Console(swagger_agent_team.run_stream(
-            task="query api spec from swagger."
-        )
-    )
+
+    await Console(swagger_agent_team.run_stream(task="query api spec from swagger."))
