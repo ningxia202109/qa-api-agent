@@ -48,35 +48,3 @@ class ApiSpec:
 
     def full_spec_in_json(self) -> str:
         return json.dumps(self.full_spec(), indent=2)
-
-
-# Example usage
-if __name__ == "__main__":
-    spec_data = {
-        "delete": {
-            "produces": ["application/json"],
-            "responses": {"200": {"description": "Anything passed in request"}},
-            "summary": "Returns anything passed in request data.",
-            "tags": ["Anything"],
-        },
-        "get": {
-            "parameters": [
-                {"in": "header", "name": "Authorization", "schema": {"type": "string"}}
-            ],
-            "produces": ["application/json"],
-            "responses": {"200": {"description": "Anything passed in request"}},
-            "summary": "Returns anything passed in request data.",
-            "tags": ["Anything"],
-        },
-    }
-
-    api_spec = ApiSpec("/anything", spec_data)
-
-    print(api_spec)
-    print(f"All methods: {api_spec.get_all_methods()}")
-    print(f"GET method details: {api_spec.get_method('get')}")
-    print(f"GET content types: {api_spec.get_content_types('get')}")
-    print(f"DELETE 200 response: {api_spec.get_response('delete', '200')}")
-    print(f"GET parameters: {api_spec.get_parameters('get')}")
-    print("Full spec:")
-    print(api_spec.full_spec())

@@ -1,3 +1,3 @@
-from .swagger_reader import SwaggerAPIReader
+from .swagger_reader import get_api_spec
 
-__all__ = ['SwaggerAPIReader']
+__all__ = ["get_api_spec"]

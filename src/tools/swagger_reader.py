@@ -2,6 +2,7 @@ import requests
 from typing import Dict, Optional
 from src.models import ApiSpec
 
+
 class SwaggerAPIReader:
     def __init__(self, swagger_url: str):
         self.swagger_url = swagger_url
@@ -72,18 +73,10 @@ class SwaggerAPIReader:
                     print(f"      {status}: {response.get('description', 'N/A')}")
 
 
-# Example usage
-if __name__ == "__main__":
-    swagger_url = "https://httpbin.org/spec.json"
+def get_api_spec() -> str:
+    api_url = "https://httpbin.org/spec.json"
+    reader = SwaggerAPIReader(api_url)
 
-    api_reader = SwaggerAPIReader(swagger_url)
-    # api_reader.print_api_summary()
-
-    # Example of accessing a specific endpoint
     selected_api = "/bytes/{n}"
-    selected_apiSpec = api_reader.get_endpoint(selected_api)
-    if selected_apiSpec:
-        print(f"\nDetails for {selected_api} endpoint:")
-        print(f"Methods: {selected_apiSpec.get_all_methods()}")
-        print("Full specification in JSON format:")
-        print(selected_apiSpec.full_spec_in_json())
+    selected_apiSpec = reader.get_endpoint(selected_api)
+    return selected_apiSpec.full_spec_in_json()

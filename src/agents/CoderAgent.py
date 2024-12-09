@@ -10,7 +10,12 @@ from autogen_core.components.models import (
 from autogen_ext.models import OpenAIChatCompletionClient
 from typing import Dict, List, Union
 
-from src.models import CodeReviewTask, CodeReviewResult, CodeWritingTask, CodeWritingResult
+from src.models import (
+    CodeReviewTask,
+    CodeReviewResult,
+    CodeWritingTask,
+    CodeWritingResult,
+)
 
 system_prompt = f"""
 You are an expert Python programmer specializing in data processing and analysis. Your main responsibilities include:
@@ -66,5 +71,3 @@ class CoderAgent(RoutedAgent):
         await self.publish_message(
             code_review_task, topic_id=TopicId("default", self.id.key)
         )
-
-
