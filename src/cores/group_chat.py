@@ -12,8 +12,9 @@ async def group_chat():
 
     termination = text_termination | max_message_termination
     swagger_agent = agents.swagger_agent()
+    code_writer_agent = agents.code_writer_agent()
     swagger_agent_team = RoundRobinGroupChat(
-        [swagger_agent],
+        [swagger_agent, code_writer_agent],
         termination_condition=termination,
     )
 
