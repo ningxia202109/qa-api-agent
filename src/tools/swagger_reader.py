@@ -72,6 +72,15 @@ class SwaggerAPIReader:
                     print(f"      {status}: {response.get('description', 'N/A')}")
 
 
+def get_api_spec() -> str:
+    api_url = "https://httpbin.org/spec.json"
+    reader = SwaggerAPIReader(api_url)
+
+    selected_api = "/bytes/{n}"
+    selected_apiSpec = reader.get_endpoint(selected_api)
+    return selected_apiSpec.full_spec_in_json()
+
+
 # Example usage
 if __name__ == "__main__":
     swagger_url = "https://httpbin.org/spec.json"

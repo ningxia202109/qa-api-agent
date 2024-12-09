@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from autogen_core.base import MessageContext, TopicId
 from autogen_core.components import RoutedAgent, default_subscription, message_handler
 from autogen_core.components.models import (
@@ -8,11 +10,20 @@ from autogen_core.components.models import (
     UserMessage,
 )
 from autogen_core.components.tools import FunctionTool
+from autogen_core.base import AgentId, AgentInstantiationContext, MessageContext
 from autogen_ext.models import OpenAIChatCompletionClient
 from typing import Dict, List, Union
 from typing import List
 
-from src.tools import SwaggerAPIReader
+from autogen_core.components.tool_agent import ToolAgent, tool_agent_caller_loop
+from autogen_core.components.tools import FunctionTool, Tool, ToolSchema
+
+from autogen_agentchat.agents import CodingAssistantAgent, ToolUseAssistantAgent
+
+from autogen_agentchat.task import TextMentionTermination
+from autogen_agentchat.teams import RoundRobinGroupChat
+
+from src.tools import get_api_spec
 
 
 system_prompt = f'''
@@ -21,18 +32,25 @@ you use tool to read and understand Swagger API specifications,
 
 '''
 
-class SwaggerAgent(RoutedAgent):
-    def __init__(self):
-        super().__init__("Swagger Agent")
-        self._system_messages: List[LLMMessage] = [
-            SystemMessage(system_prompt)
-        ]
-        self._model_client = OpenAIChatCompletionClient(model="gpt-4o-mini"),
-        self.tool = FunctionTool(get_stock_price, description="Get the stock price.")
-        # self._tool_schema = tool_schema
-        # self._tool_agent_id = AgentId(tool_agent_type, self.id.key)
+async def swagger_agent() -> None:
+
+    llm_client = OpenAIChatCompletionClient(model="gpt-4o-mini")
 
 
+    swagger_agent = ToolUseAssistantAgent(
+        name="swagger_agent",
+        model_client=llm_client,
+        registered_tools=[FunctionTool(
+        get_api_spec,
+        description="Query API spec info from swagger API. return api spec.",
+    )],
+        description="Query API spec info from swagger API. return api spec in json format.",
+        system_message=system_prompt,
+    )
 
-
-
+    RoundRobinGroupChat(
+        [swagger_agent],
+        termination_condition=TextMentionTermination("TERMINATE"),
+    ).run_stream(
+            task="query api spec from swagger."
+        )

@@ -1,7 +1,7 @@
 from .CoderAgent import CoderAgent
-from .SwaggerAgent import SwaggerAgent
+from .SwaggerAgent import swagger_agent
 
 __all__ = [
     "CoderAgent",
-    "SwaggerAgent"
+    "swagger_agent"
 ]
