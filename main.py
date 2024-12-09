@@ -1,12 +1,9 @@
 import asyncio
-from src.tools import get_api_spec
-from src.agents import swagger_agent
+from src.cores import group_chat
 
 
 def main():
-    # print(get_api_spec())
-    asyncio.run(swagger_agent())
-
+    asyncio.run(group_chat())
 
 if __name__ == "__main__":
     main()
