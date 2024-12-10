@@ -49,7 +49,7 @@ flowchart
     subgraph output["Outputs"]
         direction TB
         apiSpec("📄 API Spec Doc")
-        testScript("📜 Test Script")
+        testScript("📜 Code")
         pr("🔀 PR")
     end
 
