@@ -77,6 +77,6 @@ def get_api_spec() -> str:
     api_url = "https://httpbin.org/spec.json"
     reader = SwaggerAPIReader(api_url)
 
-    selected_api = "/bytes/{n}"
+    selected_api = "/get"
     selected_apiSpec = reader.get_endpoint(selected_api)
     return selected_apiSpec.full_spec_in_json()
