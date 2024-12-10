@@ -2,6 +2,8 @@ import requests
 from typing import Dict, Optional
 from src.models import ApiSpec
 
+HTTPBIN_API_SPEC_URL = "https://httpbin.org/spec.json"
+
 
 class SwaggerAPIReader:
     def __init__(self, swagger_url: str):
@@ -74,9 +76,13 @@ class SwaggerAPIReader:
 
 
 def get_api_spec() -> str:
-    api_url = "https://httpbin.org/spec.json"
-    reader = SwaggerAPIReader(api_url)
-
+    reader = SwaggerAPIReader(HTTPBIN_API_SPEC_URL)
     selected_api = "/get"
     selected_apiSpec = reader.get_endpoint(selected_api)
+    return selected_apiSpec.full_spec_in_json()
+
+
+def get_api_spec_by_path(api_path: str) -> str:
+    reader = SwaggerAPIReader(HTTPBIN_API_SPEC_URL)
+    selected_apiSpec = reader.get_endpoint(api_path)
     return selected_apiSpec.full_spec_in_json()
