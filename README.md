@@ -40,15 +40,22 @@ flowchart
     end
 
     %% Output subgraph (right)
-    subgraph output["📊 Results"]
+    subgraph report["📊 Report"]
         direction TB
-        pr("🔀 PR")
         slack("💬 Slack")
+    end
+
+    %% Output subgraph (right)
+    subgraph output["Outputs"]
+        direction TB
+        apiSpec("📄 API Spec Doc")
+        testScript("📜 Test Script")
+        pr("🔀 PR")
     end
 
     %% Other elements
     TestEngine("⚙️ Test Engine")
-    LLM["🧠 GPT-4 or Mini"]
+    LLM["🧠 GPT-4o-mini"]
 
     %% Cross-graph links
     SwaggerServer <--> |"2 Get API Info"| SwaggerReader
@@ -60,12 +67,15 @@ flowchart
     CoderReviewer -.-> LLM
     SwaggerReader -.-> LLM
     TestExecuter -.-> LLM
-    QAAgent --> output
+    QAAgent --> report
+    SwaggerReader ==> apiSpec
+    CodeWriter ==> testScript
+    CoderReviewer ==> pr
 
     %% Apply styles
     class SwaggerReader,QAAgent,CodeWriter,CoderReviewer,TestExecuter highlight;
     class LLM llm;
-    class pr,slack output;
+    class pr,slack,apiSpec,testScript output;
 ```
 
 ## Multiple AI Agents workflow
