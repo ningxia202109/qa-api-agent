@@ -1,5 +1,7 @@
 import unittest
 from src.models import ApiSpec, HttpMethod
+
+
 class TestApiSpec(unittest.TestCase):
 
     def setUp(self):
@@ -8,18 +10,9 @@ class TestApiSpec(unittest.TestCase):
                 "summary": "Get pet",
                 "description": "Returns a single pet",
                 "parameters": [
-                    {
-                        "name": "petId",
-                        "in": "path",
-                        "required": True,
-                        "type": "integer"
-                    }
+                    {"name": "petId", "in": "path", "required": True, "type": "integer"}
                 ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation"
-                    }
-                }
+                "responses": {"200": {"description": "Successful operation"}},
             },
             "post": {
                 "summary": "Add pet",
@@ -29,17 +22,11 @@ class TestApiSpec(unittest.TestCase):
                         "name": "body",
                         "in": "body",
                         "required": True,
-                        "schema": {
-                            "$ref": "#/definitions/Pet"
-                        }
+                        "schema": {"$ref": "#/definitions/Pet"},
                     }
                 ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    }
-                }
-            }
+                "responses": {"201": {"description": "Created"}},
+            },
         }
         self.api_spec = ApiSpec("/pet/{petId}", self.sample_methods)
 
@@ -80,5 +67,6 @@ class TestApiSpec(unittest.TestCase):
         full_spec = self.api_spec.full_spec()
         self.assertIsInstance(full_spec, dict)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

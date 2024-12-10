@@ -1,0 +1,11 @@
+/post:
+  post:
+    parameters: []
+    produces:
+    - application/json
+    responses:
+      '200':
+        description: The request's POST parameters.
+    summary: The request's POST parameters.
+    tags:
+    - HTTP Methods

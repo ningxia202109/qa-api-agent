@@ -40,15 +40,22 @@ flowchart
     end
 
     %% Output subgraph (right)
-    subgraph output["📊 Results"]
+    subgraph report["📊 Report"]
         direction TB
-        pr("🔀 PR")
         slack("💬 Slack")
+    end
+
+    %% Output subgraph (right)
+    subgraph output["Outputs"]
+        direction TB
+        apiSpec("📄 API Spec Doc")
+        testScript("📜 Code")
+        pr("🔀 PR")
     end
 
     %% Other elements
     TestEngine("⚙️ Test Engine")
-    LLM["🧠 GPT-4 or Mini"]
+    LLM["🧠 GPT-4o-mini"]
 
     %% Cross-graph links
     SwaggerServer <--> |"2 Get API Info"| SwaggerReader
@@ -60,12 +67,15 @@ flowchart
     CoderReviewer -.-> LLM
     SwaggerReader -.-> LLM
     TestExecuter -.-> LLM
-    QAAgent --> output
+    QAAgent --> report
+    SwaggerReader ==> apiSpec
+    CodeWriter ==> testScript
+    CoderReviewer ==> pr
 
     %% Apply styles
     class SwaggerReader,QAAgent,CodeWriter,CoderReviewer,TestExecuter highlight;
     class LLM llm;
-    class pr,slack output;
+    class pr,slack,apiSpec,testScript output;
 ```
 
 ## Multiple AI Agents workflow
@@ -102,10 +112,67 @@ flowchart LR
     class Handoffs,Reflection group
     class QAAgent,SwaggerReader,TestExecuter,CodeWriter,CodeReviewer agent
     class Handoffs,Reflection agent
-
-
 ```
 
+### Chain-of-Thought (CoT)
+```mermaid
+sequenceDiagram
+    actor QA as API QA
+    participant AIQA as AI QA Agent
+    participant SR as Swagger Reader
+    participant CW as Code Writer
+    participant CR as Code Reviewer
+    participant TE as Test Executer
+    participant TEngine as Test Engine
+    participant LLM as LLM
+
+    %% Define styles
+    rect rgb(240, 248, 255)
+        Note over QA,LLM: Task Initialization
+        QA ->> AIQA: Main-Task: API test
+        AIQA ->> LLM: Q: How to do API test
+        LLM -->> AIQA: A: Separate main task to 3 sub-tasks:<br/>1. Get API spec<br/>2. Create test code<br/>3. Execute test code
+    end
+
+    rect rgb(255, 250, 240)
+        Note over AIQA,SR: Sub-Task 1: Get API Spec
+        AIQA ->> SR: Sub-Task: Get API spec
+        SR ->> LLM: Q: How to get API spec
+        LLM -->> SR: A: Get API spec from Swagger
+    end
+
+    rect rgb(240, 255, 240)
+        Note over AIQA,CR: Sub-Task 2: Create and Review Test Code
+        AIQA ->> CW: Sub-Task: Create test code
+        loop Code Creation and Review
+            SR ->> CW: Content: API spec
+            CW ->> LLM: Q: Write test code for API spec
+            LLM -->> CW: A: Test code
+            CW ->> CR: Sub-Task: Review Test code
+            SR ->> CR: Content: API spec
+            CR ->> LLM: Q: Review test code for API spec
+            LLM -->> CR: A: Approval/Reject
+            alt Rejected
+                CR ->> CW: Reject
+            else Approved
+                CR ->> AIQA: Approval
+            end
+        end
+    end
+
+    rect rgb(255, 240, 245)
+        Note over AIQA,QA: Sub-Task 3: Execute Test Code
+        AIQA ->> TE: Sub-Task: Execute API test
+        CW ->> TE: Content: Test code
+        TE ->> LLM: Q: How to execute test code
+        LLM -->> TE: A: Execute test code in test engine
+        TE ->> TEngine: Execute test code
+        TEngine ->> TE: Test result
+        TE ->> AIQA: Test result
+        AIQA ->> QA: Test result
+    end
+
+```
 
 ## References:
 - [AutoGen dev version](https://microsoft.github.io/autogen/dev/)

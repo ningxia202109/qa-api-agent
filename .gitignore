@@ -162,6 +162,13 @@ cython_debug/
 #.idea/
 
 # VS Code
-.vscode/
+/.vscode/
 
-temp_scripts/
+# Ignore temporary files
+/temp_scripts/
+
+# Ignore new YAML files in api-specs directory
+/api-specs/*.yaml
+
+# But don't ignore existing YAML files
+!/api-specs/httpbin_org_post.yaml
