@@ -6,7 +6,7 @@ from autogen_agentchat.task import Console
 from autogen_ext.code_executors import DockerCommandLineCodeExecutor
 
 
-async def group_chat() -> None:
+async def group_chat(task_message) -> None:
 
     text_termination = TextMentionTermination("TERMINATE")
     max_message_termination = MaxMessageTermination(10)
@@ -26,17 +26,17 @@ async def group_chat() -> None:
         )
 
         await Console(
-            swagger_agent_team.run_stream(task="query api spec from swagger.")
+            swagger_agent_team.run_stream(
+                task=task_message
+            )  # Sample task message is "query api spec from swagger."
         )
 
 
-async def swagger_tool() -> None:
+async def swagger_tool(task_message) -> None:
 
     swagger_agent_team = RoundRobinGroupChat(
         [swagger_agent.swagger_agent_with_input()],
         termination_condition=MaxMessageTermination(2),
     )
 
-    await Console(
-        swagger_agent_team.run_stream(task="query api spec for api_path '/post'.")
-    )
+    await Console(swagger_agent_team.run_stream(task=task_message))

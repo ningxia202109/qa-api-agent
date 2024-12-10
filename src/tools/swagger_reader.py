@@ -1,4 +1,8 @@
 import requests
+import yaml
+import os
+from urllib.parse import urlparse
+
 from typing import Dict, Optional
 from src.models import ApiSpec
 
@@ -84,5 +88,17 @@ def get_api_spec() -> str:
 
 def get_api_spec_by_path(api_path: str) -> str:
     reader = SwaggerAPIReader(HTTPBIN_API_SPEC_URL)
-    selected_apiSpec = reader.get_endpoint(api_path)
-    return selected_apiSpec.full_spec_in_json()
+    api_spec = reader.get_endpoint(api_path)
+    api_spec_yaml = yaml.dump(api_spec.full_spec(), default_flow_style=False)
+
+    # Generate a filename based on the API path
+    hostname = urlparse(HTTPBIN_API_SPEC_URL).hostname.replace(".", "_")
+    api_path_filename = api_path.replace("/", "_").strip("_")
+    filename = f"{hostname}_{api_path_filename}.yaml"
+    file_path = os.path.join("./api-specs", filename)
+
+    # Write the YAML to a file
+    with open(file_path, "w") as file:
+        file.write(api_spec_yaml)
+
+    return api_spec.full_spec_in_json()

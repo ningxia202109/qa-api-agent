@@ -1,41 +1,51 @@
+import os
 import unittest
 from unittest.mock import patch, Mock, MagicMock
 from src.tools import swagger_reader
+from urllib.parse import urlparse
+
+from src.tools.swagger_reader import get_api_spec_by_path, SwaggerAPIReader
+
+HTTPBIN_API_SPEC_URL = "https://httpbin.org/spec.json"
 
 
 class TestGetApiSpecByPath(unittest.TestCase):
     @patch("src.tools.swagger_reader.SwaggerAPIReader")
-    def test_get_api_spec_by_path(self, MockSwaggerAPIReader):
-        test_cases = [
-            {
-                "name": "test case 1: valid api path",
-                "api_path": "/valid/path",
-                "expected_result": '{"valid": "spec"}',
-                "mock_return_value": Mock(
-                    full_spec_in_json=Mock(return_value='{"valid": "spec"}')
-                ),
-            },
-            {
-                "name": "test case 2: invalid api path",
-                "api_path": "/invalid/path",
-                "expected_result": "{}",
-                "mock_return_value": Mock(full_spec_in_json=Mock(return_value="{}")),
-            },
-            {
-                "name": "test case 3: empty api path",
-                "api_path": "",
-                "expected_result": "{}",
-                "mock_return_value": Mock(full_spec_in_json=Mock(return_value="{}")),
-            },
-        ]
+    @patch("src.tools.swagger_reader.yaml")
+    @patch("src.tools.swagger_reader.open", new_callable=MagicMock)
+    def test_get_api_spec_by_path(self, mock_open, mock_yaml, mock_reader):
+        # Setup
+        api_path = "/api/path"
+        expected_api_spec = {"api": "spec"}
+        expected_api_spec_yaml = "api: spec"
+        expected_filename = "httpbin_org_api_path.yaml"
+        expected_file_path = f"./api-specs/{expected_filename}"
+        expected_json_result = '{"api": "spec"}'
 
-        for test in test_cases:
-            with self.subTest(test["name"]):
-                MockSwaggerAPIReader.return_value.get_endpoint.return_value = test[
-                    "mock_return_value"
-                ]
-                result = swagger_reader.get_api_spec_by_path(test["api_path"])
-                self.assertEqual(result, test["expected_result"])
+        mock_reader_instance = mock_reader.return_value
+        mock_reader_instance.get_endpoint.return_value.full_spec.return_value = (
+            expected_api_spec
+        )
+        mock_reader_instance.get_endpoint.return_value.full_spec_in_json.return_value = (
+            expected_json_result
+        )
+
+        mock_yaml.dump.return_value = expected_api_spec_yaml
+
+        # Call the function
+        actual_result = get_api_spec_by_path(api_path)
+
+        # Asserts
+        mock_reader.assert_called_once_with(HTTPBIN_API_SPEC_URL)
+        mock_reader_instance.get_endpoint.assert_called_once_with(api_path)
+        mock_yaml.dump.assert_called_once_with(
+            expected_api_spec, default_flow_style=False
+        )
+        mock_open.assert_called_once_with(expected_file_path, "w")
+        mock_open.return_value.__enter__().write.assert_called_once_with(
+            expected_api_spec_yaml
+        )
+        self.assertEqual(expected_json_result, actual_result)
 
 
 class TestGetApiSpec(unittest.TestCase):
