@@ -1,7 +1,7 @@
 from autogen_agentchat.agents import CodingAssistantAgent
 from autogen_ext.models import OpenAIChatCompletionClient
 
-system_prompt = f"""
+system_prompt_shell = f"""
 You are a shell script writer, you create a shell script to test API endpoints.
 <IMPORTS>
 1. Write a shell script in markdown block, and it will be execute
@@ -29,21 +29,49 @@ fi
 </SAMPLE_SHELL_SCRIPT>
 """
 
+system_prompt_python = """
+You are a proficient coder. You write code to test API endpoints.
+Work with the reviewer to improve your code.
+Always put all finished code in a single Markdown code block.
+The API Spec is from swagger_agent_with_input
+The API_BASE_URL is "https://httpbin.org/"
+
+<SAMPLE_PYTHON_CODE>
+import requests
+
+def test_post_endpoint(url):
+    # Perform the POST request
+    response = requests.post(url)
+
+    # Assert the response status code is 200 OK
+    assert response.status_code == 200, f"Expected status code 200, got {response.status_code}"
+
+    # Parse the response JSON
+    response_data = response.json()
+
+    # Optionally, assert the structure of the JSON response
+    assert isinstance(response_data, dict), "Response should be a JSON object"
+
+    print("Test passed: Received valid JSON response.")
+
+# Example usage
+if __name__ == "__main__":
+    test_post_endpoint("https://httpbin.org/post")
+</SAMPLE_PYTHON_CODE>
+
+Respond using the following format:
+Thoughts: <Your comments>
+Code: <Your code>
+"""
+
 
 def code_writer_agent() -> CodingAssistantAgent:
 
     coder_agent = CodingAssistantAgent(
         name="code_writer_agent",
         model_client=OpenAIChatCompletionClient(model="gpt-4o-mini"),
-        description="Write code based on the given prompt.",
-        system_message=system_prompt,
+        description="An agent for writing code.",
+        system_message=system_prompt_python,
     )
-
-    def write_code_to_file(self, filename):
-        with open(filename, "w") as f:
-            f.write(self.last_message())
-
-    # Attach the method to the agent
-    coder_agent.write_code_to_file = write_code_to_file.__get__(coder_agent)
 
     return coder_agent
