@@ -62,7 +62,7 @@ def swagger_agent() -> ToolUseAssistantAgent:
                 description="Query API spec info from swagger API Spec. return api spec.",
             )
         ],
-        description="Query API spec info from swagger API. return api spec",
+        description="An agent for querying API spec info from swagger API, return api spec",
         system_message=system_prompt,
     )
     return swagger_agent
@@ -78,7 +78,7 @@ def swagger_agent_with_input() -> ToolUseAssistantAgent:
                 description="Input an API path, query the API spec info from swagger API Spec. return api spec.",
             )
         ],
-        description="Query API spec info from swagger API. return api spec.",
+        description="An agent for querying API spec info from swagger API. return api spec.",
         system_message=system_prompt_with_input,
     )
     return swagger_agent
